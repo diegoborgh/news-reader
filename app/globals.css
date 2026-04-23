@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+@variant dark (&:where(.dark, .dark *));
+
+:root {
+  --bg: #FAFAF8;
+  --sidebar: #F4F3F0;
+  --card: #FFFFFF;
+  --fg: #111111;
+  --muted: #888888;
+  --rule: #E5E4E0;
+  --accent: #C0392B;
+
+  /* Written at runtime by SidebarShell; default matches the shell's initial width. */
+  --sidebar-width: 220px;
+}
+
+.dark {
+  --bg: #141312;
+  --sidebar: #1A1917;
+  --card: #201F1D;
+  --fg: #EEECEA;
+  --muted: #8A8785;
+  --rule: #2E2C2A;
+  --accent: #D44332;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-sidebar: var(--sidebar);
+  --color-card: var(--card);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-rule: var(--rule);
+  --color-accent: var(--accent);
+
+  --font-serif: var(--font-playfair);
+  --font-sans: var(--font-dm-sans);
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+body {
+  font-family: var(--font-sans);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
