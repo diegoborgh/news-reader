@@ -27,7 +27,7 @@ export function FeedShell({
   topbarLabel,
   topbarMobileLabel,
   backLabel,
-  country: _country,
+  country,
   children,
 }: {
   topbarLabel: string;
@@ -92,10 +92,10 @@ export function FeedShell({
       savedScrollY.current = scrollRef.current?.scrollTop ?? 0;
       setSelected((e as CustomEvent<FeedArticle>).detail);
       articleHistoryPushed.current = true;
-      // Push via Next.js router so the entry is part of Next.js's navigation
-      // stack. Raw history.pushState is invisible to the router and causes it
-      // to jump over our entry straight to the previous route on back.
-      router.push(pathname, { scroll: false });
+      // Hash suffix guarantees a new history entry even when the pathname
+      // hasn't changed, so router.back() in handleBack always peels off
+      // exactly this entry rather than overshooting to the previous route.
+      router.push(`${pathname}#_article`, { scroll: false });
     };
     const handlePopstate = () => {
       if (articleHistoryPushed.current) closeArticle();
@@ -140,6 +140,7 @@ export function FeedShell({
         <SearchView
           key={searchQuery}
           query={searchQuery}
+          country={country}
           onSelectArticle={setSelected}
         />
       </>

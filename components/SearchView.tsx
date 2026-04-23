@@ -7,9 +7,11 @@ import type { FeedArticle } from "@/lib/feed-types";
 
 export function SearchView({
   query,
+  country,
   onSelectArticle,
 }: {
   query: string;
+  country?: string;
   onSelectArticle: (article: FeedArticle) => void;
 }) {
   const [articles, setArticles] = useState<FeedArticle[]>([]);
@@ -18,7 +20,7 @@ export function SearchView({
   useEffect(() => {
     setLoading(true);
     setArticles([]);
-    searchNews(query).then((results) => {
+    searchNews(query, country).then((results) => {
       setArticles(results);
       setLoading(false);
     });

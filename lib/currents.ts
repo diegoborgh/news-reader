@@ -160,7 +160,8 @@ export interface PagedOptions {
 }
 
 function pagedParams({ country, language, page, pageSize }: PagedOptions): Record<string, string> {
-  const params: Record<string, string> = { language: language ?? "en" };
+  const params: Record<string, string> = {};
+  if (language) params.language = language;
   if (country) params.country = country.toUpperCase();
   if (page && page > 1) params.page_number = String(page);
   if (pageSize && pageSize > 0) params.page_size = String(pageSize);

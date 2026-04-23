@@ -1,4 +1,4 @@
-# Intentional Reader
+# Meridian News Reader
 
 A web-based news reader designed as a calm alternative to algorithmic feeds. See [CLAUDE.md](CLAUDE.md) for the product brief and constraints.
 

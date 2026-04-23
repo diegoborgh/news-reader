@@ -12,11 +12,11 @@ import { countryCodeToLanguage } from "@/lib/regions-store";
 import { formatRelative } from "@/lib/time";
 import type { FeedArticle } from "@/lib/feed-types";
 
-export async function searchNews(query: string): Promise<FeedArticle[]> {
+export async function searchNews(query: string, country?: string): Promise<FeedArticle[]> {
   const keywords = query.trim();
   if (!keywords) return [];
   try {
-    const articles = await searchArticles(keywords, { pageSize: 16 });
+    const articles = await searchArticles(keywords, { country, pageSize: 16 });
     const now = new Date();
     return articles.slice(0, 16).map((a) => ({
       ...a,
