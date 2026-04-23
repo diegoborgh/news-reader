@@ -67,7 +67,7 @@ export function NewsCard({
       {showImage && (
         <div
           className={`bg-rule sm:static sm:inset-auto sm:shrink-0 ${
-            layoutHorizontal ? "sm:w-2/5 sm:self-stretch" : "sm:aspect-[16/9] sm:w-full"
+            layoutHorizontal ? "sm:w-2/5 sm:self-stretch" : "sm:aspect-[16/9] sm:max-h-[150px] sm:w-full"
           } absolute inset-0`}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -151,12 +151,12 @@ function HeroVariant({
       className="group relative flex h-full w-full cursor-pointer flex-col overflow-hidden rounded-lg border border-rule bg-card text-left transition-shadow hover:shadow-[0_6px_28px_rgba(0,0,0,0.09)]"
     >
       {showImage && (
-        <div className="absolute inset-0 bg-rule sm:static sm:inset-auto sm:aspect-[16/9] sm:w-full sm:shrink-0">
+        <div className="absolute inset-0 bg-rule sm:static sm:inset-auto sm:aspect-[16/9] sm:max-h-[280px] sm:w-full sm:shrink-0">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={article.image!}
             alt=""
-            className="h-full w-full object-cover object-top"
+            className={`h-full w-full object-cover ${article.url.includes("seekingalpha.com") ? "object-center" : "object-top"}`}
             onError={onImgError}
           />
           {/* Mobile-only gradient overlay — mirrors standard card behaviour */}
@@ -185,7 +185,7 @@ function HeroVariant({
       )}
 
       {/* Hidden on mobile when image is present (text shown in overlay above instead) */}
-      <div className={`relative flex flex-1 flex-col justify-center gap-2.5 px-7 py-5 ${showImage ? "hidden sm:flex" : ""}`}>
+      <div className={`relative flex flex-1 flex-col gap-2.5 px-7 py-4 ${showImage ? "hidden sm:flex" : ""}`}>
         <span className="flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-[0.1em] text-accent">
           <span className="inline-block h-0.5 w-5 bg-accent" />
           {category}

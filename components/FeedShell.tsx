@@ -130,7 +130,9 @@ export function FeedShell({
       />
       <MobilePillNav />
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 pt-7 pb-16 sm:px-8">
-        {children}
+        <div className="mx-auto w-full max-w-[1316px]">
+          {children}
+        </div>
       </div>
     </>
   );
