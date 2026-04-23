@@ -1,50 +1,84 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { ArticleView } from "@/components/ArticleView";
-import { InfiniteSection } from "@/components/InfiniteSection";
 import { MobilePillNav } from "@/components/MobilePillNav";
 import { SearchView } from "@/components/SearchView";
 import { Topbar } from "@/components/Topbar";
 import type { FeedArticle } from "@/lib/feed-types";
-import { SECTIONS } from "@/lib/sections";
-
-export interface SectionInitial {
-  key: (typeof SECTIONS)[number]["key"];
-  label: string;
-  articles: FeedArticle[];
-}
 
 export function FeedShell({
   topbarLabel,
   topbarMobileLabel,
   backLabel,
-  country,
-  sections,
+  country: _country,
+  children,
 }: {
   topbarLabel: string;
   topbarMobileLabel?: string;
   backLabel: string;
   country?: string;
-  sections: SectionInitial[];
+  children: React.ReactNode;
 }) {
+  const router = useRouter();
+  const pathname = usePathname();
   const [selected, setSelected] = useState<FeedArticle | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchKey, setSearchKey] = useState(0);
+  // Tracks whether we pushed a Next.js router entry when opening the article.
+  // Browser back pops that entry (same URL) instead of navigating to the
+  // previous route; popstate then closes the article via handlePopstate.
+  const articleHistoryPushed = useRef(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const savedScrollY = useRef(0);
 
   const clearSearch = useCallback(() => {
     setSearchQuery("");
     setSearchKey((k) => k + 1);
   }, []);
 
-  useEffect(() => {
-    const close = () => {
-      setSelected(null);
-      clearSearch();
-    };
-    window.addEventListener("meridian:close-article", close);
-    return () => window.removeEventListener("meridian:close-article", close);
+  const closeArticle = useCallback(() => {
+    articleHistoryPushed.current = false;
+    setSelected(null);
+    clearSearch();
   }, [clearSearch]);
+
+  const handleBack = useCallback(() => {
+    const hadEntry = articleHistoryPushed.current;
+    closeArticle(); // close immediately; don't wait for popstate
+    if (hadEntry) router.back(); // clean up the history entry we pushed on open
+  }, [closeArticle, router]);
+
+  // Restore scroll position after the scroll container remounts on article close.
+  useEffect(() => {
+    if (!selected && scrollRef.current) {
+      scrollRef.current.scrollTop = savedScrollY.current;
+    }
+  }, [selected]);
+
+  useEffect(() => {
+    const open = (e: Event) => {
+      savedScrollY.current = scrollRef.current?.scrollTop ?? 0;
+      setSelected((e as CustomEvent<FeedArticle>).detail);
+      articleHistoryPushed.current = true;
+      // Push via Next.js router so the entry is part of Next.js's navigation
+      // stack. Raw history.pushState is invisible to the router and causes it
+      // to jump over our entry straight to the previous route on back.
+      router.push(pathname, { scroll: false });
+    };
+    const handlePopstate = () => {
+      if (articleHistoryPushed.current) closeArticle();
+    };
+    window.addEventListener("meridian:open-article", open);
+    window.addEventListener("meridian:close-article", closeArticle);
+    window.addEventListener("popstate", handlePopstate);
+    return () => {
+      window.removeEventListener("meridian:open-article", open);
+      window.removeEventListener("meridian:close-article", closeArticle);
+      window.removeEventListener("popstate", handlePopstate);
+    };
+  }, [closeArticle, pathname, router]);
 
   if (selected) {
     return (
@@ -52,7 +86,7 @@ export function FeedShell({
         article={selected}
         fallbackCategory={backLabel}
         backLabel={backLabel}
-        onBack={() => setSelected(null)}
+        onBack={handleBack}
       />
     );
   }
@@ -95,17 +129,8 @@ export function FeedShell({
         key={searchKey}
       />
       <MobilePillNav />
-      <div className="flex-1 overflow-y-auto px-6 pt-7 pb-16 sm:px-8">
-        {sections.map((s) => (
-          <InfiniteSection
-            key={`${country ?? "home"}-${s.key}`}
-            sectionKey={s.key}
-            label={s.label}
-            country={country}
-            initialArticles={s.articles}
-            onSelectArticle={setSelected}
-          />
-        ))}
+      <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 pt-7 pb-16 sm:px-8">
+        {children}
       </div>
     </>
   );

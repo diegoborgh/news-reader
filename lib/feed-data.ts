@@ -14,7 +14,7 @@ export const PAGE_ONE_SIZE = 8;
 // Tag shared with revalidateTag("edition") in the refresh action.
 const EDITION_TAGS = ["edition"];
 
-async function fetchSectionPageOne(
+async function tryFetch(
   sectionKey: SectionKey,
   country: string | null,
 ): Promise<CurrentsArticle[]> {
@@ -50,6 +50,18 @@ async function fetchSectionPageOne(
   return section.category
     ? getByCategory(section.category, options, EDITION_TAGS)
     : getLatestNews(options, EDITION_TAGS);
+}
+
+async function fetchSectionPageOne(
+  sectionKey: SectionKey,
+  country: string | null,
+): Promise<CurrentsArticle[]> {
+  const articles = await tryFetch(sectionKey, country);
+  if (articles.length > 0) return articles;
+  // Currents API sometimes returns 500 (treated as []) transiently right after
+  // a cache bust when 7 parallel requests hit at once. Retry once after 800ms.
+  await new Promise<void>((r) => setTimeout(r, 800));
+  return tryFetch(sectionKey, country);
 }
 
 /**

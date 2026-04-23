@@ -6,6 +6,7 @@ import {
   getLatestNews,
   searchArticles,
 } from "@/lib/currents";
+import { getSectionPageOne } from "@/lib/feed-data";
 import { findSection, type SectionKey } from "@/lib/sections";
 import { countryCodeToLanguage } from "@/lib/regions-store";
 import { formatRelative } from "@/lib/time";
@@ -32,6 +33,23 @@ export async function searchNews(query: string): Promise<FeedArticle[]> {
 // server components and picks up the freshly fetched articles.
 export async function refreshEdition() {
   revalidateTag("edition");
+}
+
+/**
+ * Client-side recovery path: called by InfiniteSectionClient when a section
+ * renders empty after a router.refresh(). Runs getSectionPageOne (which
+ * includes its own server-side retry) in a fresh server-action context,
+ * bypassing any cached empty result from the previous render.
+ */
+export async function fetchSectionArticles(
+  sectionKey: SectionKey,
+  country?: string,
+): Promise<FeedArticle[]> {
+  try {
+    return await getSectionPageOne(sectionKey, country ?? null);
+  } catch {
+    return [];
+  }
 }
 
 const DEFAULT_PAGE_SIZE = 24;

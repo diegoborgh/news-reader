@@ -18,6 +18,7 @@ export function RefreshButton() {
       onClick={() => {
         startTransition(async () => {
           await refreshEdition();
+          await new Promise<void>((r) => setTimeout(r, 800));
           router.refresh();
         });
       }}

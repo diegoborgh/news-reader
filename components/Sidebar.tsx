@@ -56,7 +56,7 @@ export function Sidebar({
                 Meridian
               </span>
             </Link>
-            <span className="mt-1 block text-[10px] font-medium uppercase tracking-[0.12em] text-muted">
+            <span className="mt-[14px] block text-[10px] font-medium uppercase tracking-[0.12em] text-muted">
               Trusted Journalism
             </span>
           </div>

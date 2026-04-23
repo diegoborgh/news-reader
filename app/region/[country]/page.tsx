@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
-import { FeedShell, type SectionInitial } from "@/components/FeedShell";
-import { getSectionPageOne } from "@/lib/feed-data";
+import { Suspense } from "react";
+import { FeedShell } from "@/components/FeedShell";
+import { SectionSkeleton } from "@/components/SectionSkeleton";
+import { SectionStream } from "@/components/SectionStream";
 import { countryCodeToName } from "@/lib/regions-store";
 import { SECTIONS } from "@/lib/sections";
 
@@ -19,20 +21,13 @@ export default async function RegionPage({ params }: Props) {
   const code = country.toUpperCase();
   const name = countryCodeToName(code);
 
-  const sections: SectionInitial[] = await Promise.all(
-    SECTIONS.map(async (s) => ({
-      key: s.key,
-      label: s.label,
-      articles: await getSectionPageOne(s.key, code),
-    })),
-  );
-
   return (
-    <FeedShell
-      topbarLabel={name}
-      backLabel={name}
-      country={code}
-      sections={sections}
-    />
+    <FeedShell topbarLabel={name} backLabel={name} country={code}>
+      {SECTIONS.map((s) => (
+        <Suspense key={`${code}-${s.key}`} fallback={<SectionSkeleton label={s.label} />}>
+          <SectionStream sectionKey={s.key} label={s.label} country={code} />
+        </Suspense>
+      ))}
+    </FeedShell>
   );
 }

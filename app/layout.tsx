@@ -29,10 +29,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${playfair.variable} ${dmSans.variable}`}>
-      <head>
-        {/* Reads localStorage before first paint to avoid a flash of the wrong theme. */}
-        <script dangerouslySetInnerHTML={{ __html: `(function(){try{if(localStorage.getItem('meridian_theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}})()` }} />
-      </head>
+      <head />
       <body className="flex h-screen overflow-hidden bg-bg text-fg antialiased">
         <SidebarShell />
         <div className="flex flex-1 flex-col overflow-hidden">
