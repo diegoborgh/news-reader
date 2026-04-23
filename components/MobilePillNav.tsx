@@ -14,7 +14,15 @@ export function MobilePillNav() {
         <Link
           key={section.key}
           href={`/#${section.key}`}
-          onClick={() => window.dispatchEvent(new CustomEvent("meridian:close-article"))}
+          onClick={(e) => {
+              const key = section.key;
+              if (document.getElementById(key)) {
+                e.preventDefault();
+                window.dispatchEvent(new CustomEvent("meridian:scroll-to-section", { detail: key }));
+              } else {
+                window.dispatchEvent(new CustomEvent("meridian:close-article"));
+              }
+            }}
           className="shrink-0 rounded-full border border-rule bg-card px-3.5 py-1.5 text-xs font-medium whitespace-nowrap text-fg transition-colors hover:bg-black/5 dark:hover:bg-white/8"
         >
           {section.label}

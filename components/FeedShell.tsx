@@ -8,6 +8,21 @@ import { SearchView } from "@/components/SearchView";
 import { Topbar } from "@/components/Topbar";
 import type { FeedArticle } from "@/lib/feed-types";
 
+function animateScroll(container: HTMLElement, to: number, duration: number) {
+  const from = container.scrollTop;
+  const delta = to - from;
+  const t0 = performance.now();
+  function step(now: number) {
+    const elapsed = Math.min(now - t0, duration);
+    const t = elapsed / duration;
+    // cubic ease-in-out: stronger deceleration into the target
+    const eased = t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 4 / 2;
+    container.scrollTop = from + delta * eased;
+    if (elapsed < duration) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
 export function FeedShell({
   topbarLabel,
   topbarMobileLabel,
@@ -49,6 +64,21 @@ export function FeedShell({
     closeArticle(); // close immediately; don't wait for popstate
     if (hadEntry) router.back(); // clean up the history entry we pushed on open
   }, [closeArticle, router]);
+
+  useEffect(() => {
+    const handleScrollTo = (e: Event) => {
+      const key = (e as CustomEvent<string>).detail;
+      const el = document.getElementById(key);
+      const container = scrollRef.current;
+      if (!el || !container) return;
+      const to = container.scrollTop + el.getBoundingClientRect().top - container.getBoundingClientRect().top;
+      const distance = Math.abs(to - container.scrollTop);
+      const duration = Math.min(Math.max(distance * 0.2, 500), 1000);
+      animateScroll(container, to, duration);
+    };
+    window.addEventListener("meridian:scroll-to-section", handleScrollTo);
+    return () => window.removeEventListener("meridian:scroll-to-section", handleScrollTo);
+  }, []);
 
   // Restore scroll position after the scroll container remounts on article close.
   useEffect(() => {

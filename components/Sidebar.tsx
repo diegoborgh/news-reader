@@ -118,7 +118,15 @@ function NavLink({
   collapsed: boolean;
 }) {
   const handleClick = href.startsWith("/#")
-    ? () => window.dispatchEvent(new CustomEvent("meridian:close-article"))
+    ? (e: React.MouseEvent) => {
+        const key = href.slice(2);
+        if (document.getElementById(key)) {
+          e.preventDefault();
+          window.dispatchEvent(new CustomEvent("meridian:scroll-to-section", { detail: key }));
+        } else {
+          window.dispatchEvent(new CustomEvent("meridian:close-article"));
+        }
+      }
     : undefined;
 
   if (collapsed) {
