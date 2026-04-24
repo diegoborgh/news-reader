@@ -14,6 +14,15 @@ export const PAGE_ONE_SIZE = 8;
 // Tag shared with revalidateTag("edition") in the refresh action.
 const EDITION_TAGS = ["edition"];
 
+function applyExclusions(articles: CurrentsArticle[], excludeKeywords?: string[]): CurrentsArticle[] {
+  if (!excludeKeywords || excludeKeywords.length === 0) return articles;
+  const lower = excludeKeywords.map((k) => k.toLowerCase());
+  return articles.filter((a) => {
+    const haystack = `${a.title} ${a.description}`.toLowerCase();
+    return !lower.some((kw) => haystack.includes(kw));
+  });
+}
+
 async function tryFetch(
   sectionKey: SectionKey,
   country: string | null,
@@ -21,13 +30,15 @@ async function tryFetch(
   const section = findSection(sectionKey);
   if (!section) return [];
   const language = country ? countryCodeToLanguage(country) : "en";
-  const options = { country: country ?? undefined, language, page: 1, pageSize: PAGE_ONE_SIZE };
+  // Fetch a larger pool when exclusions are active so filtering still leaves PAGE_ONE_SIZE articles.
+  const fetchSize = section.excludeKeywords?.length ? PAGE_ONE_SIZE * 4 : PAGE_ONE_SIZE;
+  const options = { country: country ?? undefined, language, page: 1, pageSize: fetchSize };
+
+  let articles: CurrentsArticle[];
 
   if (section.searchKeywords) {
-    return searchArticles(section.searchKeywords, options, EDITION_TAGS);
-  }
-
-  if (section.categories && section.categories.length > 0) {
+    articles = await searchArticles(section.searchKeywords, options, EDITION_TAGS);
+  } else if (section.categories && section.categories.length > 0) {
     const perCat = Math.ceil(PAGE_ONE_SIZE / section.categories.length);
     const results = await Promise.all(
       section.categories.map((cat) =>
@@ -44,12 +55,14 @@ async function tryFetch(
         if (result[i]) merged.push(result[i]);
       }
     }
-    return merged;
+    articles = merged;
+  } else {
+    articles = section.category
+      ? await getByCategory(section.category, options, EDITION_TAGS)
+      : await getLatestNews(options, EDITION_TAGS);
   }
 
-  return section.category
-    ? getByCategory(section.category, options, EDITION_TAGS)
-    : getLatestNews(options, EDITION_TAGS);
+  return applyExclusions(articles, section.excludeKeywords);
 }
 
 async function fetchSectionPageOne(

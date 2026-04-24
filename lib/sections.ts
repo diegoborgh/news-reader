@@ -9,7 +9,6 @@ export type SectionKey =
   | "lifestyle"
   | "health"
   | "environment"
-  | "education"
   | "sports";
 
 export interface Section {
@@ -19,13 +18,15 @@ export interface Section {
   /** Fetch from multiple categories and interleave results. */
   categories?: CurrentsCategory[];
   searchKeywords?: string;
+  /** Case-insensitive substrings — articles whose title or description contain any of these are dropped. */
+  excludeKeywords?: string[];
 }
 
 export const SECTIONS: readonly Section[] = [
   { key: "latest", label: "Latest News", category: "politics_government" },
   { key: "general", label: "General", category: "general" },
   { key: "technology", label: "Technology", category: "science_technology" },
-  { key: "business", label: "Business", category: "economy_business_finance" },
+  { key: "business", label: "Business", category: "economy_business_finance", excludeKeywords: ["Earnings Call"] },
   {
     key: "entertainment",
     label: "Entertainment",
@@ -39,7 +40,6 @@ export const SECTIONS: readonly Section[] = [
   },
   { key: "health", label: "Health", category: "health" },
   { key: "environment", label: "Environment", category: "environment" },
-  { key: "education", label: "Education", category: "education" },
   { key: "sports", label: "Sports", category: "sport" },
 ] as const;
 

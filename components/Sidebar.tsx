@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Bookmark,
-  BookOpen,
   Cpu,
   Film,
   Heart,
@@ -29,7 +28,6 @@ const SECTION_ICONS: Record<SectionKey, React.ReactNode> = {
   lifestyle: <Utensils className="h-3.5 w-3.5" strokeWidth={1.8} />,
   health: <Heart className="h-3.5 w-3.5" strokeWidth={1.8} />,
   environment: <Leaf className="h-3.5 w-3.5" strokeWidth={1.8} />,
-  education: <BookOpen className="h-3.5 w-3.5" strokeWidth={1.8} />,
   sports: <Trophy className="h-3.5 w-3.5" strokeWidth={1.8} />,
 };
 

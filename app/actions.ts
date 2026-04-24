@@ -80,6 +80,14 @@ export async function loadMoreArticles(
     articles = await getLatestNews(options);
   }
 
+  if (section.excludeKeywords && section.excludeKeywords.length > 0) {
+    const lower = section.excludeKeywords.map((k) => k.toLowerCase());
+    articles = articles.filter((a) => {
+      const haystack = `${a.title} ${a.description}`.toLowerCase();
+      return !lower.some((kw) => haystack.includes(kw));
+    });
+  }
+
   const now = new Date();
   return articles.map((a) => ({
     ...a,
