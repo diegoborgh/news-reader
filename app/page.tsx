@@ -4,13 +4,12 @@ import { SectionSkeleton } from "@/components/SectionSkeleton";
 import { SectionStream } from "@/components/SectionStream";
 import { DEFAULT_REGION_CODE } from "@/lib/regions-store";
 import { SECTIONS } from "@/lib/sections";
-import { formatCompactTopbarDate, formatTopbarDate } from "@/lib/time";
+import { TopbarDate } from "@/components/TopbarDate";
 
 export default function HomePage() {
   return (
     <FeedShell
-      topbarLabel={formatTopbarDate()}
-      topbarMobileLabel={formatCompactTopbarDate()}
+      topbarLabel={<TopbarDate />}
       backLabel="Today"
       country={DEFAULT_REGION_CODE}
     >

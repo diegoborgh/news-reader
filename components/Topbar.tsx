@@ -11,8 +11,8 @@ export function Topbar({
   onSearchClear,
   searchActive,
 }: {
-  label: string;
-  mobileLabel?: string;
+  label: React.ReactNode;
+  mobileLabel?: React.ReactNode;
   count: number | null;
   right?: React.ReactNode;
   onSearch?: (query: string) => void;

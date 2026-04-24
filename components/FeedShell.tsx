@@ -30,8 +30,8 @@ export function FeedShell({
   country,
   children,
 }: {
-  topbarLabel: string;
-  topbarMobileLabel?: string;
+  topbarLabel: React.ReactNode;
+  topbarMobileLabel?: React.ReactNode;
   backLabel: string;
   country?: string;
   children: React.ReactNode;
