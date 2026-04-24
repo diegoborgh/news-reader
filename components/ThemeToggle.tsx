@@ -3,7 +3,7 @@
 import { Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 
-export function ThemeToggle({ collapsed }: { collapsed: boolean }) {
+export function ThemeToggle({ collapsed = false, pill }: { collapsed?: boolean; pill?: boolean }) {
   const [dark, setDark] = useState(false);
 
   useEffect(() => {
@@ -22,6 +22,19 @@ export function ThemeToggle({ collapsed }: { collapsed: boolean }) {
   const icon = dark
     ? <Sun className="h-3.5 w-3.5" strokeWidth={1.8} />
     : <Moon className="h-3.5 w-3.5" strokeWidth={1.8} />;
+
+  if (pill) {
+    return (
+      <button
+        type="button"
+        aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
+        onClick={toggle}
+        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-rule bg-card text-muted transition-colors hover:bg-black/5 dark:hover:bg-white/8"
+      >
+        {icon}
+      </button>
+    );
+  }
 
   if (collapsed) {
     return (

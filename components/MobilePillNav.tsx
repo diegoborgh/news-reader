@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Bookmark } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { SECTIONS } from "@/lib/sections";
 
 export function MobilePillNav() {
@@ -29,6 +30,7 @@ export function MobilePillNav() {
         </Link>
       ))}
       <div className="flex-1" />
+      <ThemeToggle pill />
       <Link
         href="/bookmarks"
         aria-label="Bookmarks"
